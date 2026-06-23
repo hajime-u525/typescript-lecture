@@ -19,5 +19,9 @@ export abstract class Character {
     }
   }
 
+  isDead(): boolean {
+    return this.hp <= 0;
+  }
+
   abstract attack(opponent: Character): void;
 }
