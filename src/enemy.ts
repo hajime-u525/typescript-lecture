@@ -1,7 +1,7 @@
 import { Character } from "./character";
 
 export class Enemy extends Character {
-  maxHp: number;
+  readonly maxHp: number; //基本はreadonlyで定義することで、外部からの変更を防ぐことができる
 
   constructor(name: string, hp: number) {
     super(name, hp);
