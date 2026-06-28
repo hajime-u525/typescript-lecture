@@ -6,7 +6,7 @@ export class Archer extends Character {
   constructor(name: string, hp: number, arrows: number) {
     super(name, hp);
     this.arrows = arrows;
-  };
+  }
 
   attack() {
     if (this.arrows <= 0) {
