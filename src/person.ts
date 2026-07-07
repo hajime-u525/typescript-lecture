@@ -21,4 +21,8 @@ export class Person {
   public changePassword(newPassword: string): void {
     this.password = newPassword;
   }
+
+  public getPassword(): string {
+    return this.password;
+  }
 }
