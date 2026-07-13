@@ -22,6 +22,11 @@ export abstract class Character {
     }
   }
 
+  takeHeal(heal: number): void {
+    // 回復分だけHPを増やす
+    this.hp += heal;
+  }
+
   isDead(): boolean {
     // HPが0以下なら倒れている(true)を返す
     return this.hp <= 0;

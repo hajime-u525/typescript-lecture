@@ -1,6 +1,7 @@
 import { Mage } from "./mage";
 import { Warrior } from "./warrior";
 import { Enemy } from "./enemy";
+import { HolyPriest } from "./holy-priest";
 
 // const character = new Character("太郎", 200); // abstract class はインスタンス化出来ないのでエラーが出る
 
@@ -50,3 +51,23 @@ while (!warrior2.isDead() && !slime2.isDead()) {
 
   if (warrior2.isDead()) break;
 }
+
+// =========================
+// ③ HolyPriest 蘇生テスト
+// =========================
+
+console.log("=== HolyPriest 蘇生テスト ===");
+
+const priest = new HolyPriest("ホーリープリースト", 100);
+
+// 倒れたキャラを用意
+const deadWarrior = new Warrior("アーサー", 30, "エクスカリバー");
+
+deadWarrior.takeDamage(30);
+
+deadWarrior.showStatus();
+
+// 蘇生
+priest.revive(deadWarrior);
+
+deadWarrior.showStatus();
