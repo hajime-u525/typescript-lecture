@@ -1,73 +1,62 @@
+import { Character } from "./character";
+import { Enemy } from "./enemy";
 import { Mage } from "./mage";
 import { Warrior } from "./warrior";
-import { Enemy } from "./enemy";
-import { HolyPriest } from "./holy-priest";
+import { Priest } from "./priest";
+import type { Healable } from "./healable";
 
-// const character = new Character("太郎", 200); // abstract class はインスタンス化出来ないのでエラーが出る
-
+const enemy = new Enemy("ドラゴン", 200);
 const warrior = new Warrior("アーサー", 100, "エクスカリバー");
 const mage = new Mage("メディア", 80);
-const slime = new Enemy("スライム", 50);
 
-// =========================
-// ① これまでのテスト（残すだけ）
-// =========================
-console.log("=== テストバトル（単発） ===");
+// 回復役
+const healer: Healable = new Priest("アリス", 100);
+
+// 味方パーティを「共通の型」の配列でまとめる
+const party: Character[] = [warrior, mage];
 
 warrior.showStatus();
 mage.showStatus();
-slime.showStatus();
+enemy.showStatus();
 
-warrior.attack(slime);
-mage.attack(slime);
+while (true) {
+  // 味方の攻撃
+  for (const member of party) {
+    if (!member.isDead()) {
+      member.attack(enemy);
+    }
+  }
 
-slime.showStatus();
+  // 敵が倒れたら終了
+  if (enemy.isDead()) {
+    console.log("ドラゴンを倒した！");
+    break;
+  }
 
-slime.attack(warrior);
+  // 敵の反撃（生きている最初の味方を攻撃）
+  const target = party.find((member) => !member.isDead());
 
-warrior.showStatus();
+  if (target) {
+    enemy.attack(target);
+  }
 
-// =========================
-// ② 課題：whileバトル
-// =========================
+  // 味方が全滅したら終了
+  if (party.every((member) => member.isDead())) {
+    console.log("パーティは全滅した...");
+    break;
+  }
 
-console.log("=== 本番バトル（ループ） ===");
+  // 回復
+  const healTarget = party.find((member) => !member.isDead());
 
-// もう一回キャラ作る（状態リセット）
-const warrior2 = new Warrior("アーサー", 100, "エクスカリバー");
-const slime2 = new Enemy("スライム", 50);
+  if (healTarget) {
+    healer.heal(healTarget);
+  }
 
-warrior2.showStatus();
-slime2.showStatus();
+  // 全員のHP表示
+  enemy.showStatus();
 
-while (!warrior2.isDead() && !slime2.isDead()) {
-  warrior2.attack(slime2);
-  slime2.showStatus();
-
-  if (slime2.isDead()) break;
-
-  slime2.attack(warrior2);
-  warrior2.showStatus();
-
-  if (warrior2.isDead()) break;
+  for (const member of party) {
+    member.showStatus();
+  }
 }
-
-// =========================
-// ③ HolyPriest 蘇生テスト
-// =========================
-
-console.log("=== HolyPriest 蘇生テスト ===");
-
-const priest = new HolyPriest("ホーリープリースト", 100);
-
-// 倒れたキャラを用意
-const deadWarrior = new Warrior("アーサー", 30, "エクスカリバー");
-
-deadWarrior.takeDamage(30);
-
-deadWarrior.showStatus();
-
-// 蘇生
-priest.revive(deadWarrior);
-
-deadWarrior.showStatus();
