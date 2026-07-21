@@ -1,33 +1,24 @@
-// src/main.ts
+class ValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ValidationError";
+  }
+}
 
 function divide(a: number, b: number): number {
-  // bが0ならエラーを発生させる
   if (b === 0) {
-    throw new Error("0で割ることはできません");
+    throw new ValidationError("0で割ることは出来ません");
   }
-
-  // そうでなければ割り算の結果を返す
   return a / b;
 }
 
-// 成功パターン
 try {
-  const result = divide(10, 2);
-  console.log(result);
+  console.log(divide(10, 2));
+  console.log(divide(10, 0));
 } catch (error) {
-  console.error((error as Error).message);
+  if (error instanceof ValidationError) {
+    console.error(error);
+  }
 } finally {
-  console.log("計算を終了しました");
+  console.log("計算終了");
 }
-
-// 失敗パターン
-try {
-  const result = divide(10, 0);
-  console.log(result);
-} catch (error) {
-  console.error((error as Error).message);
-} finally {
-  console.log("計算を終了しました");
-}
-
-//７・20課題ように書き換え.  RPGのメインTSは過去ブランチにあり
