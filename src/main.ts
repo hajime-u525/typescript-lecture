@@ -5,20 +5,52 @@ class ValidationError extends Error {
   }
 }
 
-function divide(a: number, b: number): number {
-  if (b === 0) {
-    throw new ValidationError("0で割ることは出来ません");
+function purchase(
+  itemInput: string,
+  quantityInput: string,
+  stock: number,
+): void {
+  // 商品が空（trimして長さ0）
+  if (itemInput.trim().length === 0) {
+    throw new ValidationError("商品名を入力してください。");
   }
-  return a / b;
+
+  // 数量が1以上の整数でない
+  const quantity = Number(quantityInput);
+
+  if (!Number.isInteger(quantity) || quantity <= 0) {
+    throw new ValidationError("数量は1以上の整数で入力してください。");
+  }
+
+  // 数量 > 在庫
+  if (quantity > stock) {
+    throw new ValidationError(`在庫が不足しています（在庫: ${stock}）。`);
+  }
+
+  // 全部通れば購入成功
+  console.log(`購入しました: ${itemInput} × ${quantity}`);
 }
 
-try {
-  console.log(divide(10, 2));
-  console.log(divide(10, 0));
-} catch (error) {
-  if (error instanceof ValidationError) {
-    console.error(error);
+function onPurchase(
+  itemInput: string,
+  quantityInput: string,
+  stock: number,
+): void {
+  try {
+    purchase(itemInput, quantityInput, stock);
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      console.error(`⚠️ ${error.message}`);
+    } else {
+      console.error("想定外のエラーが発生しました");
+    }
+  } finally {
+    console.log("購入処理が完了しました");
   }
-} finally {
-  console.log("計算終了");
 }
+
+// 動作確認
+onPurchase("りんご", "3", 10);
+onPurchase("", "3", 10);
+onPurchase("みかん", "0", 10);
+onPurchase("ぶどう", "20", 5);
