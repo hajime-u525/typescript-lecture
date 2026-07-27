@@ -1,56 +1,42 @@
-class ValidationError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "ValidationError";
-  }
+// ① Map を使用して、3人の名前と年齢を登録
+const people = new Map<string, number>();
+
+people.set("田中", 20);
+people.set("佐藤", 25);
+people.set("鈴木", 30);
+
+// ループで表示
+for (const [name, age] of people) {
+  console.log(`${name}: ${age}歳`);
 }
 
-function purchase(
-  itemInput: string,
-  quantityInput: string,
-  stock: number,
-): void {
-  // 商品が空（trimして長さ0）
-  if (itemInput.trim().length === 0) {
-    throw new ValidationError("商品名を入力してください。");
-  }
+console.log("----------------");
 
-  // 数量が1以上の整数でない
-  const quantity = Number(quantityInput);
+// ② Set を使用して重複のない値を管理
+const fruits = new Set<string>();
 
-  if (!Number.isInteger(quantity) || quantity <= 0) {
-    throw new ValidationError("数量は1以上の整数で入力してください。");
-  }
+// 追加
+fruits.add("りんご");
+fruits.add("みかん");
+fruits.add("ぶどう");
+fruits.add("りんご"); // 重複しているので追加されない
 
-  // 数量 > 在庫
-  if (quantity > stock) {
-    throw new ValidationError(`在庫が不足しています（在庫: ${stock}）。`);
-  }
+// 削除
+fruits.delete("みかん");
 
-  // 全部通れば購入成功
-  console.log(`購入しました: ${itemInput} × ${quantity}`);
+// 表示
+for (const fruit of fruits) {
+  console.log(fruit);
 }
 
-function onPurchase(
-  itemInput: string,
-  quantityInput: string,
-  stock: number,
-): void {
-  try {
-    purchase(itemInput, quantityInput, stock);
-  } catch (error) {
-    if (error instanceof ValidationError) {
-      console.error(`⚠️ ${error.message}`);
-    } else {
-      console.error("想定外のエラーが発生しました");
-    }
-  } finally {
-    console.log("購入処理が完了しました");
-  }
+console.log("----------------");
+
+// ③ メールアドレスの形式を検証する関数
+function isValidEmail(email: string): boolean {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
 }
 
 // 動作確認
-onPurchase("りんご", "3", 10);
-onPurchase("", "3", 10);
-onPurchase("みかん", "0", 10);
-onPurchase("ぶどう", "20", 5);
+console.log(isValidEmail("test@example.com")); // true
+console.log(isValidEmail("invalid-email")); // false
