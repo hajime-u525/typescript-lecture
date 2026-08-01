@@ -1,42 +1,75 @@
-// ① Map を使用して、3人の名前と年齢を登録
-const people = new Map<string, number>();
-
-people.set("田中", 20);
-people.set("佐藤", 25);
-people.set("鈴木", 30);
-
-// ループで表示
-for (const [name, age] of people) {
-  console.log(`${name}: ${age}歳`);
+class ValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ValidationError";
+  }
 }
 
-console.log("----------------");
+// 登録済みメールアドレス（重複チェック用）
+const registeredEmails = new Set<string>();
 
-// ② Set を使用して重複のない値を管理
-const fruits = new Set<string>();
+// 登録者一覧（名前 → メールアドレス）
+const users = new Map<string, string>();
 
-// 追加
-fruits.add("りんご");
-fruits.add("みかん");
-fruits.add("ぶどう");
-fruits.add("りんご"); // 重複しているので追加されない
+function registerUser(nameInput: string, emailInput: string): void {
+  const name = nameInput.trim();
 
-// 削除
-fruits.delete("みかん");
+  if (name.length === 0) {
+    throw new ValidationError("名前を入力してください。");
+  }
 
-// 表示
-for (const fruit of fruits) {
-  console.log(fruit);
+  const email = emailInput.trim();
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailRegex.test(email)) {
+    throw new ValidationError("メールアドレスの形式が正しくありません。");
+  }
+
+  if (registeredEmails.has(email)) {
+    throw new ValidationError("このメールアドレスは既に登録されています。");
+  }
+
+  // メールアドレスを登録済みに追加
+  registeredEmails.add(email);
+
+  // Mapへ登録（名前 → メールアドレス）
+  users.set(name, email);
+
+  console.log(`登録しました: ${name} <${email}>`);
 }
 
-console.log("----------------");
-
-// ③ メールアドレスの形式を検証する関数
-function isValidEmail(email: string): boolean {
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return regex.test(email);
+function onSubmit(nameInput: string, emailInput: string): void {
+  try {
+    registerUser(nameInput, emailInput);
+  } catch (error: unknown) {
+    if (error instanceof ValidationError) {
+      console.error(`⚠️ ${error.message}`);
+    } else {
+      console.error("想定外のエラーが発生しました。", error);
+    }
+  }
 }
 
+// ----------------------
 // 動作確認
-console.log(isValidEmail("test@example.com")); // true
-console.log(isValidEmail("invalid-email")); // false
+// ----------------------
+
+onSubmit("Alice", "alice@example.com");
+onSubmit("Bob", "invalid-email");
+onSubmit("", "carol@example.com");
+onSubmit("Charlie", "alice@example.com");
+onSubmit("David", "david@example.com");
+onSubmit("Eve", "eve@example.com");
+
+// ----------------------
+// 登録者一覧
+// ----------------------
+
+console.log("=== 登録者一覧 ===");
+
+for (const [name, email] of users) {
+  console.log(`${name} <${email}>`);
+}
+
+console.log(`登録者数: ${users.size}人`);
