@@ -1,75 +1,83 @@
-class ValidationError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "ValidationError";
-  }
+// =========================================
+// 問題1
+// =========================================
+
+function fetchNumber(): Promise<number> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(42);
+    }, 1000);
+  });
 }
 
-// 登録済みメールアドレス（重複チェック用）
-const registeredEmails = new Set<string>();
+fetchNumber().then((num) => {
+  console.log("問題1:", num);
+});
 
-// 登録者一覧（名前 → メールアドレス）
-const users = new Map<string, string>();
+console.log("問題1: 待機中に別の処理が出来ます");
 
-function registerUser(nameInput: string, emailInput: string): void {
-  const name = nameInput.trim();
+// =========================================
+// 問題2
+// =========================================
 
-  if (name.length === 0) {
-    throw new ValidationError("名前を入力してください。");
-  }
-
-  const email = emailInput.trim();
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if (!emailRegex.test(email)) {
-    throw new ValidationError("メールアドレスの形式が正しくありません。");
-  }
-
-  if (registeredEmails.has(email)) {
-    throw new ValidationError("このメールアドレスは既に登録されています。");
-  }
-
-  // メールアドレスを登録済みに追加
-  registeredEmails.add(email);
-
-  // Mapへ登録（名前 → メールアドレス）
-  users.set(name, email);
-
-  console.log(`登録しました: ${name} <${email}>`);
+function fetchUserData(shouldFail: boolean): Promise<string> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (shouldFail) {
+        reject("サーバーエラー");
+      } else {
+        resolve("OK");
+      }
+    }, 1000);
+  });
 }
 
-function onSubmit(nameInput: string, emailInput: string): void {
+async function main(shouldFail: boolean): Promise<void> {
   try {
-    registerUser(nameInput, emailInput);
-  } catch (error: unknown) {
-    if (error instanceof ValidationError) {
-      console.error(`⚠️ ${error.message}`);
-    } else {
-      console.error("想定外のエラーが発生しました。", error);
-    }
+    const result = await fetchUserData(shouldFail);
+    console.log("問題2:", result);
+  } catch (error) {
+    console.log(`問題2: NG: ${error}`);
   }
 }
 
-// ----------------------
-// 動作確認
-// ----------------------
+main(false);
+main(true);
 
-onSubmit("Alice", "alice@example.com");
-onSubmit("Bob", "invalid-email");
-onSubmit("", "carol@example.com");
-onSubmit("Charlie", "alice@example.com");
-onSubmit("David", "david@example.com");
-onSubmit("Eve", "eve@example.com");
+// =========================================
+// 問題3
+// =========================================
 
-// ----------------------
-// 登録者一覧
-// ----------------------
-
-console.log("=== 登録者一覧 ===");
-
-for (const [name, email] of users) {
-  console.log(`${name} <${email}>`);
+async function task1(): Promise<string> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve("A");
+    }, 500);
+  });
 }
 
-console.log(`登録者数: ${users.size}人`);
+async function task2(): Promise<string> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve("B");
+    }, 500);
+  });
+}
+
+async function task3(): Promise<string> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve("C");
+    }, 500);
+  });
+}
+
+async function runTasksInOrder(): Promise<void> {
+  const a = await task1();
+  const b = await task2();
+  const c = await task3();
+
+  console.log(`問題3: ${a}-${b}-${c}`);
+}
+
+runTasksInOrder();
